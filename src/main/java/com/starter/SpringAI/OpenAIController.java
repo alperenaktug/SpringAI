@@ -19,6 +19,6 @@ public class OpenAIController {
     public String getAnswer(@PathVariable String message)
     {
         String response = chatModel.call(message);
-        return "Welcome to OpenAI page" + message;
+        return response;
     }
 }
