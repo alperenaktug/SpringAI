@@ -1,6 +1,7 @@
 package com.starter.SpringAI;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +21,20 @@ public class OpenAIController {
     @GetMapping("/api/{message}")
     public ResponseEntity<String> getAnswer(@PathVariable String message)
     {
-        String response = chatClients.prompt(message)
+        ChatResponse chatResponse = chatClients
+                .prompt(message)
                 .call()
-                .content();
+                .chatResponse();
+
+        System.out.println(chatResponse.getMetadata().getModel());
+        System.out.println(chatResponse.getMetadata().getUsage().getTotalTokens());
+
+
+        String response = chatResponse
+                .getResult()
+                .getOutput()
+                .getText();
+
         return ResponseEntity.ok(response);
     }
 }
