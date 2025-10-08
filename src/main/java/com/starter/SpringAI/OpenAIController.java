@@ -13,8 +13,13 @@ public class OpenAIController {
 
     private ChatClient chatClients;
 
-    public OpenAIController(OpenAiChatModel chatModel){
-        this.chatClients = ChatClient.create(chatModel);
+ //   public OpenAIController(OpenAiChatModel chatModel){
+ //       this.chatClients = ChatClient.create(chatModel);
+ //   }
+
+    public OpenAIController (ChatClient.Builder builder)
+    {
+        this.chatClients = builder.build();
     }
 
 
