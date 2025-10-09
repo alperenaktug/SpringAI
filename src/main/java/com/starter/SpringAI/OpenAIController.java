@@ -1,6 +1,9 @@
 package com.starter.SpringAI;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +20,12 @@ public class OpenAIController {
  //       this.chatClients = ChatClient.create(chatModel);
  //   }
 
-    public OpenAIController (ChatClient.Builder builder)
-    {
-        this.chatClients = builder.build();
+    ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
+
+    public OpenAIController (ChatClient.Builder builder) {
+        this.chatClients = builder
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .build();
     }
 
 
