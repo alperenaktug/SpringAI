@@ -5,11 +5,13 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 public class OpenAIController {
@@ -29,23 +31,39 @@ public class OpenAIController {
  //   }
 
 
-  //  @GetMapping("/api/{message}")
-    public ResponseEntity<String> getAnswer(@PathVariable String message)
-    {
-        ChatResponse chatResponse = chatClients
-                .prompt(message)
+    @PostMapping("/api/recommend")
+    public String recommend(@RequestParam String type,
+                            @RequestParam String year,
+                            @RequestParam String lang) {
+
+        String temp = """
+            I want to watch a {type} movie tonight with good rating, 
+            looking for movies around this year {year}. 
+            The language I'm looking for is {lang}.
+            Suggest one specific movie and tell me the cast and length of the movie.
+            
+            response format should be:
+            1. Movie Name
+            2. basic plot
+            3. cast
+            4. length
+            5. IMDB rating
+            """;
+
+        PromptTemplate promptTemplate = new PromptTemplate(temp);
+
+        Prompt prompt = promptTemplate.create(Map.of(
+                "type", type,
+                "year", year,
+                "lang", lang
+        ));
+
+        String response = chatClients
+                .prompt(prompt)
                 .call()
-                .chatResponse();
+                .content();
 
-        System.out.println(chatResponse.getMetadata().getModel());
-        System.out.println(chatResponse.getMetadata().getUsage().getTotalTokens());
-
-
-        String response = chatResponse
-                .getResult()
-                .getOutput()
-                .getText();
-
-        return ResponseEntity.ok(response);
+        return response;
     }
+
 }
